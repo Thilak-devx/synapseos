@@ -125,6 +125,67 @@ npm run db:seed
 vercel --prod
 ```
 
+## DBMS Academic Features
+
+SynapseOS includes a separate academic SQL script at `database/dbms_features.sql`.
+It is intentionally outside the Prisma schema so it does not disturb existing authentication,
+dashboards, API routes, or production app behavior.
+
+Apply the DBMS feature script to PostgreSQL:
+
+```bash
+npx prisma db execute --schema prisma/schema.prisma --file database/dbms_features.sql
+```
+
+### Trigger
+
+The script creates an `audit_logs` table and a PostgreSQL trigger on Prisma's `"User"` table.
+Whenever a new user is inserted, PostgreSQL automatically writes:
+
+```text
+New user created
+```
+
+This demonstrates how triggers automate database-level auditing even when data is inserted
+from different application paths.
+
+### Stored Procedures
+
+The script creates reusable PostgreSQL functions:
+
+- `get_dashboard_statistics()`: returns total users, active users, and report count.
+- `get_system_monitoring_summary()`: returns uptime, alert count, and transaction count.
+
+These demonstrate how stored procedures centralize reusable database logic for dashboards,
+analytics, and monitoring.
+
+### Cursor
+
+The script creates `demo_user_cursor_audit(max_rows)`, which iterates through users row by row,
+logs each processed user into `audit_logs`, and returns the processed rows.
+
+This demonstrates cursor-based row-by-row processing, a classic DBMS concept used when records
+must be handled sequentially.
+
+### Expo Demonstration
+
+During project evaluation, sign in as an Admin and open:
+
+```text
+/dashboard/dbms-features
+```
+
+Use this page to show:
+
+- Recent trigger/cursor rows from `audit_logs`.
+- Stored procedure results from `get_dashboard_statistics()`.
+- Monitoring output from `get_system_monitoring_summary()`.
+- Cursor behavior by calling the admin demo endpoint:
+
+```text
+/api/admin/dbms-features
+```
+
 ## Quality Checks
 
 Run these before opening a pull request or deploying:
