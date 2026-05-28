@@ -158,6 +158,10 @@ export const DemoExperience = memo(function DemoExperience({
     }
 
     const interval = window.setInterval(() => {
+      if (document.hidden) {
+        return;
+      }
+
       const nextEvents: DemoEvent[] = [
         {
           id: createDemoId("demo-activity"),

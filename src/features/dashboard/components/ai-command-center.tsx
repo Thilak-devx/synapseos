@@ -252,6 +252,10 @@ export const AiCommandCenter = memo(function AiCommandCenter({
 
   useEffect(() => {
     const interval = window.setInterval(() => {
+      if (document.hidden) {
+        return;
+      }
+
       setTick((current) => (current + 1) % 1000);
     }, 4800);
 

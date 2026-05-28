@@ -1,11 +1,19 @@
+import "server-only";
+
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as {
   prisma?: PrismaClient;
 };
 
 function createPrismaClient() {
+  const adapter = process.env.DATABASE_URL?.startsWith("postgresql")
+    ? new PrismaPg({ connectionString: process.env.DATABASE_URL })
+    : undefined;
+
   return new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 }
@@ -18,8 +26,4 @@ export function getPrismaClient() {
   return globalForPrisma.prisma;
 }
 
-export const prisma = new Proxy({} as PrismaClient, {
-  get(_target, property, receiver) {
-    return Reflect.get(getPrismaClient(), property, receiver);
-  },
-});
+export const prisma = getPrismaClient();

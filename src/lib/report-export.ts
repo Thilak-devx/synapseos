@@ -1,6 +1,5 @@
 "use client";
 
-import { jsPDF } from "jspdf";
 import type { ReportRecord } from "@/features/dashboard/types";
 
 type ExportableReportInput = ReportRecord | ReportRecord[];
@@ -67,7 +66,8 @@ export function buildReportCsvContent(input: ExportableReportInput) {
   return rows.map((row) => row.map((cell) => escapeCsv(cell)).join(",")).join("\n");
 }
 
-export function buildPdfReportBlob(report: ReportRecord) {
+export async function buildPdfReportBlob(report: ReportRecord) {
+  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({
     unit: "pt",
     format: "a4",
@@ -180,7 +180,7 @@ function escapeCsv(value: string | number) {
 }
 
 export async function generatePdfReport(report: ReportRecord) {
-  triggerDownload(createFilename(report, "pdf"), buildPdfReportBlob(report));
+  triggerDownload(createFilename(report, "pdf"), await buildPdfReportBlob(report));
 }
 
 export async function generateCsvReport(input: ExportableReportInput) {

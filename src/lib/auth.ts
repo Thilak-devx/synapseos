@@ -96,7 +96,9 @@ const providers: NextAuthOptions["providers"] = [
         throw new Error("Production database is not configured with a TLS PostgreSQL connection.");
       }
 
-      await ensureSeededDemoAccounts();
+      if (process.env.DEMO_SEED_ON_STARTUP === "true") {
+        await ensureSeededDemoAccounts();
+      }
 
       const { key, state } = getAuthAttemptState(parsed.data.email);
 

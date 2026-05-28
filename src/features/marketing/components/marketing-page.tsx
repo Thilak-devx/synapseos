@@ -1,36 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { animate, motion, useInView } from "framer-motion";
+import { useRef, type ReactNode } from "react";
+import { motion, useInView } from "framer-motion";
 import {
   Activity,
   ArrowRight,
   BadgeCheck,
   BellRing,
   BrainCircuit,
-  Database,
+  Command,
   FileBarChart2,
   Fingerprint,
+  GitBranch,
   Layers3,
+  LockKeyhole,
   Menu,
   Orbit,
-  Play,
   Radar,
   ShieldCheck,
-  Sparkles,
-  WandSparkles,
-  Zap,
+  TerminalSquare,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Sheet,
   SheetContent,
@@ -41,163 +33,91 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-const navItems = ["Platform", "Solutions", "Showcase", "How It Works", "Resources"];
+const navItems = [
+  { label: "Features", href: "#features" },
+  { label: "Architecture", href: "#architecture" },
+  { label: "Security", href: "#security" },
+  { label: "Dashboard", href: "#dashboard" },
+  { label: "GitHub", href: "https://github.com/" },
+];
 
-const featureCards = [
+const platformFeatures = [
   {
-    title: "RBAC Security",
-    description:
-      "Granular permissions, encrypted environments, and policy engines designed for regulated teams.",
+    title: "Role-aware command surfaces",
+    description: "Admin, manager, and user experiences stay separated by middleware, route guards, API checks, and server-side permission validation.",
     icon: Fingerprint,
-    accent: "from-cyan-400/30 via-sky-400/10 to-transparent",
   },
   {
-    title: "AI Analytics",
-    description:
-      "Ask complex data questions in natural language and surface predictive operational insights instantly.",
+    title: "DBMS-backed report engine",
+    description: "Create, archive, duplicate, restore, and export operational reports with transaction metadata and audit history attached.",
+    icon: FileBarChart2,
+  },
+  {
+    title: "AI operational copilot",
+    description: "Ask for health summaries, anomaly explanations, RBAC reviews, audit summaries, and executive-grade operational insights.",
     icon: BrainCircuit,
-    accent: "from-fuchsia-400/30 via-violet-400/10 to-transparent",
   },
   {
-    title: "Smart Automation",
-    description:
-      "Deploy autonomous playbooks that heal incidents, optimize queries, and orchestrate workflows.",
-    icon: WandSparkles,
-    accent: "from-emerald-400/30 via-teal-400/10 to-transparent",
-  },
-  {
-    title: "Realtime Monitoring",
-    description:
-      "Stream live telemetry, anomaly signals, and performance traces from every cluster and tenant.",
-    icon: Activity,
-    accent: "from-orange-400/30 via-amber-400/10 to-transparent",
-  },
-  {
-    title: "Enterprise Database",
-    description:
-      "High-availability architecture with distributed replicas, isolation controls, and multi-region readiness.",
-    icon: Database,
-    accent: "from-indigo-400/30 via-blue-400/10 to-transparent",
-  },
-  {
-    title: "Advanced Transactions",
-    description:
-      "Coordinate mission-critical writes with observability-rich transaction pipelines and rollback confidence.",
-    icon: Layers3,
-    accent: "from-pink-400/30 via-rose-400/10 to-transparent",
-  },
-];
-
-const stats = [
-  { label: "Active Users", value: 184000, suffix: "+", prefix: "" },
-  { label: "Database Operations", value: 3200000000, suffix: "+", prefix: "" },
-  { label: "Transactions/sec", value: 96000, suffix: "+", prefix: "" },
-  { label: "Uptime", value: 99.999, suffix: "%", prefix: "" },
-];
-
-const testimonials = [
-  {
-    quote:
-      "SynapseOS made our database ops feel like a product surface, not a maintenance burden.",
-    name: "Ariana Vale",
-    role: "VP Engineering, HelioStack",
-  },
-  {
-    quote:
-      "The blend of AI observability and transaction control gave our SRE team superhuman context.",
-    name: "Marcus Iden",
-    role: "Infrastructure Lead, Quantive",
-  },
-  {
-    quote:
-      "It feels like Linear met Stripe for database operations, then layered autonomous workflows on top.",
-    name: "Sana Rhee",
-    role: "CTO, Northstar Cloud",
+    title: "Realtime simulation layer",
+    description: "Live metrics, alerts, notifications, activity feeds, and chart signals make the platform feel actively operational during demos.",
+    icon: Radar,
   },
 ];
 
 const workflowSteps = [
   {
-    title: "User Request",
-    description:
-      "An operator, analyst, or product team initiates a scoped request across the SynapseOS control plane.",
-    icon: Orbit,
-    accent: "from-cyan-400/24 via-sky-400/12 to-transparent",
-    metadata: ["Input signed", "Tenant scoped", "Intent captured"],
-    detail: "API ingress • Session context",
+    title: "Request enters",
+    detail: "Operator action, report workflow, or dashboard query is scoped to the active session.",
+    icon: Command,
   },
   {
-    title: "RBAC Validation",
-    description:
-      "SynapseOS validates role scope, permission boundaries, and department-level policies before any write path opens.",
-    icon: Fingerprint,
-    accent: "from-violet-400/22 via-fuchsia-400/10 to-transparent",
-    metadata: ["Role check", "Policy graph", "Access trace"],
-    detail: "Auth layer • Zero-trust gate",
+    title: "RBAC validates",
+    detail: "Role, route, API permission, department scope, and action boundary are checked.",
+    icon: LockKeyhole,
   },
   {
-    title: "Prisma Transaction",
-    description:
-      "Critical mutations execute through validated Prisma transactions with rollback safety, referential integrity, and audit anchors.",
+    title: "Prisma commits",
+    detail: "Transactions persist reports, notifications, activity logs, and audit events safely.",
     icon: Layers3,
-    accent: "from-emerald-400/22 via-teal-400/10 to-transparent",
-    metadata: ["ACID flow", "Rollback ready", "Integrity locked"],
-    detail: "Database layer • Transaction pipeline",
   },
   {
-    title: "AI Analytics Engine",
-    description:
-      "Telemetry and historical context feed the intelligence layer to surface anomaly signals, summaries, and recommended actions.",
+    title: "AI analyzes",
+    detail: "Metrics, reports, users, and audit signals become contextual operational intelligence.",
     icon: BrainCircuit,
-    accent: "from-cyan-400/22 via-blue-400/10 to-transparent",
-    metadata: ["Anomaly scan", "Signal fusion", "Trend scoring"],
-    detail: "Inference layer • Analytics mesh",
   },
   {
-    title: "Operational Report",
-    description:
-      "A structured report is generated with metrics, execution metadata, previewable artifacts, and export-ready output formats.",
-    icon: FileBarChart2,
-    accent: "from-amber-400/22 via-orange-400/10 to-transparent",
-    metadata: ["PDF / CSV / JSON", "Metrics attached", "Preview rendered"],
-    detail: "Reporting layer • Delivery payload",
-  },
-  {
-    title: "Audit Logging + Notifications",
-    description:
-      "Every action is written to the audit stream and routed into role-aware alerts so operators retain full operational visibility.",
+    title: "Control plane updates",
+    detail: "Dashboards, alerts, exports, and notifications refresh for the correct role.",
     icon: BellRing,
-    accent: "from-pink-400/22 via-rose-400/10 to-transparent",
-    metadata: ["Audit persisted", "Alert fanned out", "Timeline updated"],
-    detail: "Control layer • Observability finish",
   },
 ];
 
-const footerColumns = [
-  {
-    title: "Platform",
-    items: ["Database Ops", "AI Analytics", "Automation", "Security"],
-  },
-  {
-    title: "Company",
-    items: ["About", "Careers", "Customers", "Contact"],
-  },
-  {
-    title: "Resources",
-    items: ["Docs", "Guides", "Changelog", "Status"],
-  },
-  {
-    title: "Legal",
-    items: ["Privacy", "Terms", "Security", "DPA"],
-  },
+const securitySignals = [
+  "Admin-only global controls",
+  "Manager department boundaries",
+  "User personal workspace isolation",
+  "Unauthorized redirects",
+  "Privileged audit events",
+  "Secure session handling",
 ];
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 28 },
+const stack = [
+  "Next.js App Router",
+  "TypeScript",
+  "Tailwind CSS",
+  "Auth.js / NextAuth",
+  "Prisma ORM",
+  "PostgreSQL / Neon",
+  "Framer Motion",
+  "Recharts",
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 18 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -205,18 +125,8 @@ const stagger = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.08,
+      staggerChildren: 0.06,
     },
-  },
-};
-
-const floatAnimation = {
-  y: [0, -10, 0],
-  transition: {
-    duration: 6,
-    ease: "easeInOut" as const,
-    repeat: Number.POSITIVE_INFINITY,
   },
 };
 
@@ -228,7 +138,7 @@ function SectionReveal({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  const inView = useInView(ref, { once: true, amount: 0.18 });
 
   return (
     <motion.div
@@ -236,870 +146,504 @@ function SectionReveal({
       initial="hidden"
       animate={inView ? "show" : "hidden"}
       variants={stagger}
-      className={className}
+      className={cn("[content-visibility:auto] [contain-intrinsic-size:720px]", className)}
     >
       {children}
     </motion.div>
   );
 }
 
-function Counter({
-  value,
-  label,
-  suffix,
-  prefix,
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  align = "center",
 }: {
-  value: number;
-  label: string;
-  suffix: string;
-  prefix: string;
+  align?: "center" | "left";
+  description: string;
+  eyebrow: string;
+  title: string;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (!inView) {
-      return;
-    }
-
-    const controls = animate(0, value, {
-      duration: 1.6,
-      ease: [0.22, 1, 0.36, 1],
-      onUpdate(latest) {
-        setDisplayValue(latest);
-      },
-    });
-
-    return () => controls.stop();
-  }, [inView, value]);
-
-  const formatted = useMemo(() => {
-    if (value >= 1000000000) {
-      return `${(displayValue / 1000000000).toFixed(1)}B`;
-    }
-
-    if (value >= 1000000) {
-      return `${(displayValue / 1000000).toFixed(1)}M`;
-    }
-
-    if (value >= 1000 && value !== 99.999) {
-      return `${Math.round(displayValue / 100) / 10}K`;
-    }
-
-    if (value === 99.999) {
-      return displayValue.toFixed(3);
-    }
-
-    return Math.round(displayValue).toString();
-  }, [displayValue, value]);
-
   return (
     <motion.div
-      ref={ref}
-      variants={fadeInUp}
-      className="rounded-[1.8rem] border border-white/10 bg-white/[0.06] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_24px_90px_rgba(0,0,0,0.35)] backdrop-blur-xl"
+      variants={fadeUp}
+      className={cn("max-w-3xl", align === "center" ? "mx-auto text-center" : "")}
     >
-      <div className="type-metric text-4xl md:text-5xl">
-        {prefix}
-        {formatted}
-        {suffix}
+      <Badge className="type-caption rounded-full border border-cyan-300/18 bg-cyan-300/10 px-4 py-1 text-cyan-100">
+        {eyebrow}
+      </Badge>
+      <h2 className="type-display mt-5 text-3xl leading-tight text-white md:text-5xl">
+        {title}
+      </h2>
+      <p className="mt-4 text-sm leading-7 text-white/58 md:text-base">
+        {description}
+      </p>
+    </motion.div>
+  );
+}
+
+function SurfaceCard({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,30,0.88),rgba(10,18,36,0.82))] p-5 shadow-lg shadow-black/10",
+        className,
+      )}
+    >
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/16 to-transparent" />
+      {children}
+    </div>
+  );
+}
+
+function DashboardPreview() {
+  return (
+    <motion.div variants={fadeUp} className="relative">
+      <div className="absolute -inset-4 rounded-[2.4rem] bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.16),transparent_34%),radial-gradient(circle_at_85%_30%,rgba(99,102,241,0.14),transparent_30%)]" />
+      <div className="relative rounded-[2rem] border border-white/12 bg-[#060b16] p-3 shadow-2xl shadow-black/30">
+        <div className="rounded-[1.6rem] border border-white/10 bg-[#081120] p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 pb-4">
+            <div>
+              <p className="type-caption text-cyan-100/60">Admin Control Center</p>
+              <h3 className="type-heading mt-1 text-xl text-white">Operational command layer</h3>
+            </div>
+            <Badge className="rounded-full border border-emerald-300/20 bg-emerald-300/10 text-emerald-100">
+              <span className="mr-1.5 size-1.5 rounded-full bg-emerald-300" />
+              System stable
+            </Badge>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-4">
+            {[
+              ["Users", "184K"],
+              ["Reports", "2,418"],
+              ["Txn/sec", "96K"],
+              ["Uptime", "99.982%"],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-[1.1rem] border border-white/8 bg-white/[0.035] p-3">
+                <p className="text-xs text-white/42">{label}</p>
+                <p className="type-metric mt-2 text-xl text-white">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-[1.25fr_0.75fr]">
+            <div className="rounded-[1.25rem] border border-white/8 bg-white/[0.03] p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm font-medium text-white">Throughput timeline</p>
+                <p className="type-caption text-cyan-100/60">Live</p>
+              </div>
+              <div className="flex h-44 items-end gap-2">
+                {[38, 52, 44, 68, 61, 76, 70, 86, 78, 92, 83, 96].map((height, index) => (
+                  <div
+                    key={`${height}-${index}`}
+                    className="flex-1 rounded-t-lg bg-gradient-to-t from-cyan-500/25 to-cyan-200/80"
+                    style={{ height: `${height}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                { icon: ShieldCheck, label: "RBAC sync", value: "Verified" },
+                { icon: BrainCircuit, label: "AI anomaly scan", value: "1 signal" },
+                { icon: Activity, label: "Audit stream", value: "Live" },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="rounded-[1.25rem] border border-white/8 bg-white/[0.03] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm text-white/45">{label}</p>
+                      <p className="mt-1 font-medium text-white">{value}</p>
+                    </div>
+                    <Icon className="size-5 text-cyan-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-      <p className="type-caption mt-3 text-white/48">{label}</p>
     </motion.div>
   );
 }
 
 export function MarketingPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#060816] text-white">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(83,168,255,0.2),_transparent_28%),radial-gradient(circle_at_80%_10%,_rgba(171,101,255,0.18),_transparent_24%),radial-gradient(circle_at_50%_100%,_rgba(29,206,160,0.12),_transparent_24%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(10,12,24,0.35),_rgba(5,6,14,0.9))]" />
-        <div className="surface-grid absolute inset-0 opacity-[0.14]" />
-      </div>
-
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {Array.from({ length: 18 }).map((_, index) => (
-          <motion.span
-            key={index}
-            className="absolute rounded-full bg-cyan-300/70 shadow-[0_0_30px_rgba(69,211,255,0.45)]"
-            style={{
-              width: index % 3 === 0 ? 4 : 2,
-              height: index % 3 === 0 ? 4 : 2,
-              left: `${(index * 13) % 100}%`,
-              top: `${(index * 17) % 100}%`,
-            }}
-            animate={{
-              y: [0, -24, 0],
-              opacity: [0.18, 0.8, 0.18],
-            }}
-            transition={{
-              duration: 5 + (index % 4),
-              delay: index * 0.15,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
+    <div className="relative min-h-screen overflow-hidden bg-[#050816] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_6%,rgba(34,211,238,0.14),transparent_30%),radial-gradient(circle_at_86%_8%,rgba(99,102,241,0.12),transparent_28%),linear-gradient(180deg,rgba(6,10,24,0.28),rgba(5,8,22,0.95))]" />
+      <div className="surface-grid pointer-events-none absolute inset-0 opacity-[0.08]" />
 
       <main className="relative z-10">
-        <section className="mx-auto w-full max-w-7xl px-5 pt-6 md:px-8">
+        <section className="mx-auto w-full max-w-7xl px-5 pt-5 md:px-8">
           <motion.nav
-            initial={{ opacity: 0, y: -24 }}
+            initial={{ opacity: 0, y: -14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="sticky top-4 z-40 rounded-full border border-white/12 bg-white/[0.08] px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl md:px-6"
+            transition={{ duration: 0.38, ease: "easeOut" }}
+            className="sticky top-4 z-40 rounded-full border border-white/12 bg-[#081120]/88 px-4 py-3 shadow-lg shadow-black/10 backdrop-blur-sm md:px-5"
           >
             <div className="flex items-center justify-between gap-4">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="relative flex size-11 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 shadow-[0_0_32px_rgba(72,211,255,0.22)]">
-                  <Orbit className="size-5 text-cyan-200" />
+              <Link href="/" className="flex min-w-0 items-center gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/24 bg-cyan-300/10">
+                  <Orbit className="size-5 text-cyan-100" />
                 </div>
-                <div>
-                  <div className="type-heading text-base text-white">
-                    SYNAPSEOS
-                  </div>
-                  <div className="type-caption text-white/40">
-                    Neural data platform
-                  </div>
+                <div className="min-w-0">
+                  <div className="type-heading text-sm text-white md:text-base">SYNAPSEOS</div>
+                  <div className="hidden text-xs text-white/40 sm:block">Enterprise DBMS control plane</div>
                 </div>
               </Link>
 
-              <div className="hidden items-center gap-7 lg:flex">
+              <div className="hidden items-center gap-6 lg:flex">
                 {navItems.map((item) => (
                   <Link
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    className="group relative text-sm text-white/68 transition-colors duration-300 hover:text-white"
+                    key={item.label}
+                    href={item.href}
+                    className="text-sm text-white/62 transition-colors duration-200 hover:text-white"
+                    target={item.label === "GitHub" ? "_blank" : undefined}
+                    rel={item.label === "GitHub" ? "noreferrer" : undefined}
                   >
-                    {item}
-                    <span className="absolute inset-x-0 -bottom-2 h-px origin-left scale-x-0 bg-gradient-to-r from-cyan-300 to-violet-300 transition-transform duration-300 group-hover:scale-x-100" />
+                    {item.label}
                   </Link>
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className="lg:hidden">
-                  <Sheet>
-                    <SheetTrigger
-                      render={
-                        <button className="flex size-11 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-white transition hover:bg-white/[0.1]">
-                          <Menu className="size-4" />
-                        </button>
-                      }
-                    />
-                    <SheetContent side="right" className="border-white/10 bg-[#07101f]/95 text-white">
-                      <SheetHeader>
-                        <SheetTitle className="text-white">SynapseOS</SheetTitle>
-                        <SheetDescription className="text-white/55">
-                          Navigate the product story and jump directly into the demo.
-                        </SheetDescription>
-                      </SheetHeader>
-                      <div className="mt-8 flex flex-col gap-3">
-                        {navItems.map((item) => (
-                          <Link
-                            key={item}
-                            href={`#${item.toLowerCase()}`}
-                            className="rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3 text-sm text-white/78 transition hover:bg-white/[0.08] hover:text-white"
-                          >
-                            {item}
-                          </Link>
-                        ))}
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-                </div>
-                <a
+              <div className="flex items-center gap-2">
+                <Sheet>
+                  <SheetTrigger
+                    render={
+                      <button className="flex size-10 items-center justify-center rounded-full border border-white/12 bg-white/[0.04] text-white transition-colors hover:bg-white/[0.08] lg:hidden">
+                        <Menu className="size-4" />
+                      </button>
+                    }
+                  />
+                  <SheetContent side="right" className="border-white/10 bg-[#07101f] text-white">
+                    <SheetHeader>
+                      <SheetTitle className="text-white">SynapseOS</SheetTitle>
+                      <SheetDescription className="text-white/55">
+                        A focused path through the enterprise DBMS story.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="mt-8 grid gap-3">
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          className="rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3 text-sm text-white/78 transition-colors hover:bg-white/[0.08]"
+                          target={item.label === "GitHub" ? "_blank" : undefined}
+                          rel={item.label === "GitHub" ? "noreferrer" : undefined}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+                <Link
                   href="/login"
-                  className="rounded-full border border-white/12 bg-white/5 px-4 py-2 text-sm text-white/78 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/10 hover:text-white"
+                  className="hidden rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-sm text-white/78 transition-colors hover:bg-white/[0.08] hover:text-white sm:inline-flex"
                 >
                   Login
-                </a>
+                </Link>
                 <Link
                   href="/dashboard"
                   className={cn(
                     buttonVariants({ variant: "default", size: "default" }),
-                    "rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 px-5 text-slate-950 shadow-[0_0_40px_rgba(77,191,255,0.35)] transition-transform duration-300 hover:-translate-y-0.5 hover:scale-[1.02]",
+                    "rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 to-blue-500 px-5 text-slate-950 shadow-sm shadow-cyan-950/20 transition-transform duration-200 hover:-translate-y-0.5 hover:brightness-110",
                   )}
                 >
-                  Get Started
+                  Launch
                 </Link>
               </div>
             </div>
           </motion.nav>
         </section>
 
-        <section className="relative mx-auto grid w-full max-w-7xl gap-14 px-5 pb-20 pt-16 md:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:pt-24">
-          <SectionReveal className="relative">
-            <motion.div variants={fadeInUp} className="inline-flex">
-              <Badge className="type-caption rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-1 text-cyan-100 shadow-[0_0_32px_rgba(0,190,255,0.18)]">
-                Award-winning AI infrastructure experience
+        <section className="mx-auto grid w-full max-w-7xl gap-8 px-5 pb-12 pt-14 md:px-8 md:pb-16 md:pt-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+          <SectionReveal>
+            <motion.div variants={fadeUp}>
+              <Badge className="type-caption rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-1 text-cyan-100">
+                AI-powered enterprise DBMS operations
               </Badge>
             </motion.div>
-
-            <motion.div variants={fadeInUp} className="mt-8 max-w-4xl">
-              <h1 className="type-display text-5xl text-balance md:text-7xl xl:text-[5.7rem]">
-                <span className="bg-gradient-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
-                  Next Generation Intelligent Database Management Platform
-                </span>
-              </h1>
-              <p className="mt-7 max-w-2xl text-lg leading-8 text-white/60 md:text-xl">
-                SynapseOS unifies observability, AI analytics, automation, and enterprise-grade
-                control into one cinematic command layer for modern data teams.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <motion.h1
+              variants={fadeUp}
+              className="type-display mt-6 max-w-5xl text-4xl leading-[1.02] text-white md:text-6xl xl:text-7xl"
+            >
+              The command layer for intelligent database operations.
+            </motion.h1>
+            <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-base leading-8 text-white/62 md:text-lg">
+              SynapseOS turns RBAC, report workflows, audit trails, AI analytics, and realtime
+              infrastructure monitoring into one premium control plane for enterprise data teams.
+            </motion.p>
+            <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/dashboard"
                 className={cn(
                   buttonVariants({ variant: "default", size: "lg" }),
-                  "group rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 px-7 text-slate-950 shadow-[0_0_45px_rgba(77,191,255,0.34)] transition-transform duration-300 hover:-translate-y-0.5 hover:scale-[1.02]",
+                  "group rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 to-blue-500 px-7 text-slate-950 shadow-sm shadow-cyan-950/20 transition-transform duration-200 hover:-translate-y-0.5 hover:brightness-110",
                 )}
               >
-                Enter the control room
-                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                Enter the Command Layer
+                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
               <Link
-                href="#showcase"
+                href="#architecture"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "rounded-full border-white/12 bg-white/5 px-7 text-white transition-transform duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:text-white",
+                  "rounded-full border-white/12 bg-white/[0.04] px-7 text-white transition-colors hover:bg-white/[0.08] hover:text-white",
                 )}
               >
-                <Play className="size-4" />
-                Watch overview
+                View architecture
               </Link>
             </motion.div>
-
-            <motion.div variants={fadeInUp} className="mt-12 grid gap-4 sm:grid-cols-3">
+            <motion.div variants={fadeUp} className="mt-8 grid gap-3 sm:grid-cols-3">
               {[
-                { label: "Neural safeguards", value: "Zero-trust RBAC" },
-                { label: "Predictive insights", value: "AI anomaly detection" },
-                { label: "Mission uptime", value: "99.999% resilience" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-[1.6rem] border border-white/10 bg-white/[0.045] p-5 backdrop-blur-xl"
-                >
-                  <div className="type-caption text-white/40">
-                    {item.label}
-                  </div>
-                  <div className="mt-3 text-base font-medium text-white/90">{item.value}</div>
-                </div>
+                ["RBAC", "Role-safe operations"],
+                ["AI", "Contextual insights"],
+                ["Audit", "Traceable workflows"],
+              ].map(([label, value]) => (
+                <SurfaceCard key={label} className="p-4">
+                  <p className="type-caption text-cyan-100/55">{label}</p>
+                  <p className="mt-2 text-sm font-medium text-white">{value}</p>
+                </SurfaceCard>
               ))}
             </motion.div>
           </SectionReveal>
 
-          <SectionReveal className="relative flex min-h-[720px] items-center justify-center lg:min-h-[760px]">
-            <motion.div
-              animate={floatAnimation}
-              className="absolute left-0 top-24 hidden w-52 rounded-[1.8rem] border border-cyan-300/15 bg-cyan-300/10 p-4 shadow-[0_0_40px_rgba(25,180,255,0.18)] backdrop-blur-2xl md:block"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-2xl bg-cyan-300/18">
-                  <ShieldCheck className="size-5 text-cyan-100" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">Security lattice</div>
-                  <div className="text-xs text-white/45">RBAC synced globally</div>
-                </div>
-              </div>
-            </motion.div>
+          <DashboardPreview />
+        </section>
 
-            <motion.div
-              animate={{
-                ...floatAnimation,
-                transition: { ...floatAnimation.transition, duration: 7, delay: 0.4 },
-              }}
-              className="absolute bottom-20 right-2 hidden w-52 rounded-[1.8rem] border border-violet-300/15 bg-violet-300/10 p-4 shadow-[0_0_40px_rgba(150,90,255,0.18)] backdrop-blur-2xl md:block"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-2xl bg-violet-300/18">
-                  <Radar className="size-5 text-violet-100" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">Live anomaly scan</div>
-                  <div className="text-xs text-white/45">0.3s detection latency</div>
-                </div>
-              </div>
-            </motion.div>
+        <section id="features" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal>
+            <SectionHeader
+              eyebrow="Focused platform"
+              title="Everything judges need to understand in one tight product story."
+              description="SynapseOS is not a generic dashboard. It demonstrates authentication, authorization, transactions, reporting, monitoring, notifications, and AI assistance as one coherent DBMS operating layer."
+            />
+            <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {platformFeatures.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.div key={feature.title} variants={fadeUp}>
+                    <SurfaceCard className="h-full transition-colors duration-200 hover:border-cyan-300/20">
+                      <div className="flex size-11 items-center justify-center rounded-[1.1rem] border border-cyan-300/18 bg-cyan-300/10">
+                        <Icon className="size-5 text-cyan-100" />
+                      </div>
+                      <h3 className="type-heading mt-5 text-lg text-white">{feature.title}</h3>
+                      <p className="mt-3 text-sm leading-7 text-white/56">{feature.description}</p>
+                    </SurfaceCard>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </SectionReveal>
+        </section>
 
-            <motion.div
-              variants={fadeInUp}
-              className="relative w-full max-w-[44rem] rounded-[2.4rem] border border-white/12 bg-white/[0.06] p-3 shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-[24px]"
-            >
-              <div className="absolute -left-14 top-20 h-40 w-40 rounded-full bg-cyan-400/15 blur-3xl" />
-              <div className="absolute -right-12 bottom-16 h-44 w-44 rounded-full bg-violet-500/14 blur-3xl" />
-
-              <div className="rounded-[2rem] border border-white/10 bg-[#090d1d]/90 p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="type-caption text-white/38">
-                      SynapseOS Core
-                    </div>
-                    <div className="type-heading text-2xl">Autonomous Database Grid</div>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-100">
-                    <span className="size-2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(78,245,168,0.8)]" />
-                    Cluster Stable
-                  </div>
-                </div>
-
-                <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                  <div className="rounded-[1.8rem] border border-white/8 bg-white/[0.035] p-5">
-                    <div className="flex items-center justify-between">
+        <section id="architecture" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <SectionHeader
+              align="left"
+              eyebrow="Operational workflow"
+              title="From request to audited intelligence."
+              description="The landing page now explains the actual enterprise flow: identity enters, RBAC validates, Prisma commits, AI analyzes, and role-aware workspaces update."
+            />
+            <motion.div variants={fadeUp} className="grid gap-3">
+              {workflowSteps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <SurfaceCard key={step.title} className="p-4">
+                    <div className="grid gap-4 sm:grid-cols-[48px_1fr_auto] sm:items-center">
+                      <div className="flex size-12 items-center justify-center rounded-[1.1rem] border border-white/10 bg-white/[0.045]">
+                        <Icon className="size-5 text-cyan-100" />
+                      </div>
                       <div>
-                        <div className="text-sm text-white/45">Database health index</div>
-                        <div className="type-metric mt-2 text-4xl">98.42</div>
+                        <p className="type-caption text-white/36">Step {String(index + 1).padStart(2, "0")}</p>
+                        <h3 className="mt-1 font-medium text-white">{step.title}</h3>
+                        <p className="mt-1 text-sm leading-6 text-white/52">{step.detail}</p>
                       </div>
-                      <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm text-cyan-100">
-                        +12.8%
-                      </div>
+                      <Badge className="w-fit rounded-full border border-emerald-300/18 bg-emerald-300/10 text-emerald-100">
+                        Live
+                      </Badge>
                     </div>
+                  </SurfaceCard>
+                );
+              })}
+            </motion.div>
+          </SectionReveal>
+        </section>
 
-                    <div className="mt-6 space-y-4">
-                      {[
-                        { label: "Replication integrity", value: "94%" },
-                        { label: "AI query optimizer", value: "88%" },
-                        { label: "Transaction confidence", value: "99%" },
-                      ].map((bar) => (
-                        <div key={bar.label}>
-                          <div className="mb-2 flex items-center justify-between text-sm text-white/55">
-                            <span>{bar.label}</span>
-                            <span>{bar.value}</span>
-                          </div>
-                          <div className="h-2 rounded-full bg-white/8">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              whileInView={{ width: bar.value }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                              className="h-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 shadow-[0_0_20px_rgba(74,200,255,0.45)]"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="rounded-[1.8rem] border border-white/8 bg-white/[0.035] p-5">
-                      <div className="text-sm text-white/45">AI recommendations</div>
-                      <div className="mt-4 space-y-3">
-                        {[
-                          "Reroute write-heavy workloads to east cluster",
-                          "Enable adaptive failover for finance namespace",
-                          "Compress cold storage snapshots by 18%",
-                        ].map((item) => (
-                          <div
-                            key={item}
-                            className="rounded-2xl border border-white/8 bg-white/[0.03] p-3 text-sm leading-6 text-white/72"
-                          >
-                            {item}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="rounded-[1.8rem] border border-white/8 bg-gradient-to-br from-cyan-300/10 via-transparent to-violet-400/10 p-5">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm text-white/45">Incident drift</div>
-                          <div className="mt-2 text-3xl font-semibold">-73%</div>
-                        </div>
-                        <Zap className="size-8 text-cyan-200" />
-                      </div>
-                      <p className="mt-4 text-sm leading-7 text-white/58">
-                        Autonomous playbooks absorbed query spikes before customer impact.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                  {[
-                    ["27", "Active automations"],
-                    ["312ms", "Median response"],
-                    ["6", "Protected regions"],
-                  ].map(([value, label]) => (
-                    <div
-                      key={label}
-                      className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4"
-                    >
-                      <div className="text-2xl font-semibold">{value}</div>
-                      <div className="mt-1 text-sm text-white/44">{label}</div>
+        <section id="security" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal className="grid gap-6 lg:grid-cols-3">
+            <motion.div variants={fadeUp} className="lg:col-span-1">
+              <SurfaceCard className="h-full">
+                <ShieldCheck className="size-9 text-cyan-100" />
+                <h2 className="type-display mt-5 text-3xl text-white md:text-4xl">
+                  RBAC that feels visible, not hidden.
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-white/58">
+                  The platform explicitly demonstrates admin, manager, and user boundaries with
+                  protected routes and scoped operations.
+                </p>
+              </SurfaceCard>
+            </motion.div>
+            <motion.div variants={fadeUp} className="lg:col-span-2">
+              <SurfaceCard>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {securitySignals.map((signal) => (
+                    <div key={signal} className="flex items-center gap-3 rounded-[1.1rem] border border-white/8 bg-white/[0.03] p-3">
+                      <BadgeCheck className="size-4 shrink-0 text-cyan-100" />
+                      <span className="text-sm text-white/68">{signal}</span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </SurfaceCard>
             </motion.div>
           </SectionReveal>
         </section>
 
-        <section id="platform" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-20">
-          <SectionReveal>
-            <motion.div variants={fadeInUp} className="mx-auto max-w-3xl text-center">
-              <Badge className="type-caption rounded-full border border-white/12 bg-white/[0.06] px-4 py-1 text-white/58">
-                Core capabilities
-              </Badge>
-              <h2 className="type-display mt-6 text-4xl md:text-6xl">
-                Precision tools for high-trust data systems
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-white/58">
-                Every feature is designed to feel fast, elegant, and deeply operational.
-              </p>
-            </motion.div>
-
-            <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {featureCards.map((feature) => (
-                <motion.div key={feature.title} variants={fadeInUp}>
-                  <Card className="group relative h-full overflow-hidden rounded-[2rem] border-white/10 bg-white/[0.055] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:border-white/18 hover:bg-white/[0.07]">
-                    <div
-                      className={cn(
-                        "absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100",
-                        `bg-gradient-to-br ${feature.accent}`,
-                      )}
-                    />
-                    <CardHeader className="relative pb-4">
-                      <div className="mb-5 flex size-14 items-center justify-center rounded-[1.4rem] border border-white/12 bg-white/[0.07] shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-                        <feature.icon className="size-6 text-cyan-100" />
-                      </div>
-                      <CardTitle className="text-2xl text-white">{feature.title}</CardTitle>
-                      <CardDescription className="text-base leading-7 text-white/58">
-                        {feature.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="relative pt-0">
-                      <div className="flex items-center gap-2 text-sm text-cyan-100/80">
-                        Explore capability
-                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                      </div>
-                    </CardContent>
-                  </Card>
+        <section className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal className="grid gap-4 lg:grid-cols-3">
+            {[
+              {
+                eyebrow: "AI analytics pipeline",
+                title: "Operational context becomes insight",
+                description: "Reports, metrics, activity logs, notifications, and role data feed the AI Command Center for realistic enterprise responses.",
+                icon: BrainCircuit,
+              },
+              {
+                eyebrow: "Realtime monitoring",
+                title: "A platform that feels alive",
+                description: "CPU, memory, DB load, active sessions, query latency, alerts, and activity streams update without heavy animation overhead.",
+                icon: Activity,
+              },
+              {
+                eyebrow: "Report operations",
+                title: "Workflow, export, audit",
+                description: "Report actions generate downloadable artifacts, lifecycle changes, notifications, and audit entries.",
+                icon: FileBarChart2,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.title} variants={fadeUp}>
+                  <SurfaceCard className="h-full">
+                    <Icon className="size-8 text-cyan-100" />
+                    <p className="type-caption mt-5 text-cyan-100/58">{item.eyebrow}</p>
+                    <h3 className="type-heading mt-3 text-xl text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-white/56">{item.description}</p>
+                  </SurfaceCard>
                 </motion.div>
+              );
+            })}
+          </SectionReveal>
+        </section>
+
+        <section id="dashboard" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+            <SectionHeader
+              align="left"
+              eyebrow="Dashboard preview"
+              title="Real product mockup, not abstract decoration."
+              description="The preview mirrors SynapseOS dashboard patterns: compact KPI cards, RBAC status, live audit signals, AI monitoring, and throughput visualization in the same visual system as the app."
+            />
+            <DashboardPreview />
+          </SectionReveal>
+        </section>
+
+        <section className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-14">
+          <SectionReveal className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <SectionHeader
+              align="left"
+              eyebrow="Tech stack"
+              title="Built on production SaaS primitives."
+              description="Modern Next.js architecture, typed workflows, secure auth, Prisma-backed persistence, and deployment-ready PostgreSQL support."
+            />
+            <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-2">
+              {stack.map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-[1.15rem] border border-white/8 bg-white/[0.035] p-4">
+                  <TerminalSquare className="size-4 text-cyan-100" />
+                  <span className="text-sm text-white/68">{item}</span>
+                </div>
               ))}
-            </div>
-          </SectionReveal>
-        </section>
-
-        <section id="solutions" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-20">
-          <SectionReveal className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {stats.map((stat) => (
-              <Counter
-                key={stat.label}
-                label={stat.label}
-                value={stat.value}
-                suffix={stat.suffix}
-                prefix={stat.prefix}
-              />
-            ))}
-          </SectionReveal>
-        </section>
-
-        <section id="showcase" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-20">
-          <SectionReveal className="grid items-center gap-12 lg:grid-cols-[0.86fr_1.14fr]">
-            <motion.div variants={fadeInUp}>
-              <Badge className="type-caption rounded-full border border-violet-300/18 bg-violet-300/10 px-4 py-1 text-violet-100">
-                Dashboard showcase
-              </Badge>
-              <h2 className="type-display mt-6 text-4xl md:text-6xl">
-                A control plane built to feel cinematic under pressure
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-white/58">
-                SynapseOS blends mission-critical telemetry with a calm, premium interface so
-                operators can move faster without losing trust in the system.
-              </p>
-
-              <div className="mt-10 space-y-4">
-                {[
-                  "Predictive cluster scoring with AI-generated remediation",
-                  "Transaction heatmaps with role-aware audit visibility",
-                  "Cross-region monitoring designed for SRE, security, and platform teams",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-3 rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4"
-                  >
-                    <BadgeCheck className="mt-1 size-5 text-cyan-200" />
-                    <p className="text-white/68">{item}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="relative">
-              <div className="absolute -inset-6 rounded-[2.6rem] bg-gradient-to-r from-cyan-400/18 via-transparent to-violet-500/18 blur-3xl" />
-              <div className="relative rounded-[2.5rem] border border-white/12 bg-white/[0.05] p-4 backdrop-blur-2xl">
-                <div className="rounded-[2rem] border border-white/10 bg-[#070b16]/95 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <div className="type-caption text-white/40">
-                        Global operations
-                      </div>
-                      <div className="type-heading mt-2 text-2xl">Telemetry Matrix</div>
-                    </div>
-                    <div className="flex gap-2">
-                      {["North Virginia", "Frankfurt", "Singapore"].map((region) => (
-                        <div
-                          key={region}
-                          className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/55"
-                        >
-                          {region}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8 grid gap-4 xl:grid-cols-[1fr_0.78fr]">
-                    <div className="rounded-[1.6rem] border border-white/8 bg-white/[0.03] p-5">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-white/44">Live activity map</div>
-                        <div className="text-sm text-cyan-100">+18% throughput</div>
-                      </div>
-                      <div className="mt-6 grid grid-cols-7 gap-2">
-                        {Array.from({ length: 49 }).map((_, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0.25 }}
-                            whileInView={{
-                              opacity: 1,
-                              scale: [1, 1.05, 1],
-                            }}
-                            viewport={{ once: true }}
-                            transition={{
-                              duration: 1.2,
-                              delay: index * 0.012,
-                              repeat: Number.POSITIVE_INFINITY,
-                              repeatDelay: 2.8,
-                            }}
-                            className={cn(
-                              "aspect-square rounded-xl",
-                              index % 5 === 0
-                                ? "bg-cyan-300/70 shadow-[0_0_18px_rgba(86,220,255,0.5)]"
-                                : index % 3 === 0
-                                  ? "bg-violet-300/45"
-                                  : "bg-white/[0.06]",
-                            )}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="rounded-[1.6rem] border border-white/8 bg-white/[0.03] p-5">
-                        <div className="text-sm text-white/44">Automation queue</div>
-                        <div className="mt-4 space-y-3">
-                          {[
-                            "Promote optimized indexes to production",
-                            "Isolate high-noise tenant segment",
-                            "Trigger forensic audit snapshot",
-                          ].map((item) => (
-                            <div
-                              key={item}
-                              className="rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3 text-sm text-white/68"
-                            >
-                              {item}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="rounded-[1.6rem] border border-white/8 bg-gradient-to-br from-cyan-300/10 to-violet-400/10 p-5">
-                        <div className="text-sm text-white/44">Neural confidence</div>
-                        <div className="type-metric mt-3 text-4xl">97.8%</div>
-                        <p className="mt-3 text-sm leading-7 text-white/56">
-                          Confidence score on automated decisions across live workload models.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           </SectionReveal>
         </section>
 
-        <section id="resources" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-20">
+        <section className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-16">
           <SectionReveal>
-            <motion.div variants={fadeInUp} className="mx-auto max-w-3xl text-center">
-              <Badge className="type-caption rounded-full border border-white/12 bg-white/[0.06] px-4 py-1 text-white/58">
-                Testimonials
-              </Badge>
-              <h2 className="type-display mt-6 text-4xl md:text-6xl">
-                Trusted by teams building the next decade of data products
-              </h2>
-            </motion.div>
-
-            <div className="mt-14 grid gap-5 lg:grid-cols-3">
-              {testimonials.map((testimonial) => (
-                <motion.div key={testimonial.name} variants={fadeInUp}>
-                  <Card className="group h-full rounded-[2rem] border-white/10 bg-white/[0.05] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_60px_rgba(85,180,255,0.12)]">
-                    <CardContent className="p-7">
-                      <div className="mb-6 flex size-12 items-center justify-center rounded-2xl border border-white/12 bg-white/[0.07]">
-                        <Sparkles className="size-5 text-cyan-100" />
-                      </div>
-                      <p className="text-lg leading-8 text-white/72">&quot;{testimonial.quote}&quot;</p>
-                      <div className="mt-8">
-                        <div className="font-medium text-white">{testimonial.name}</div>
-                        <div className="mt-1 text-sm text-white/45">{testimonial.role}</div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </SectionReveal>
-        </section>
-
-        <section id="pricing" className="mx-auto w-full max-w-7xl px-5 py-10 md:px-8 md:py-20">
-          <SectionReveal>
-            <motion.div variants={fadeInUp} className="mx-auto max-w-3xl text-center">
-              <Badge className="type-caption rounded-full border border-cyan-300/18 bg-cyan-300/10 px-4 py-1 text-cyan-100">
-                How SynapseOS Works
-              </Badge>
-              <h2 className="type-display mt-6 text-4xl md:text-6xl">
-                A real enterprise workflow from request to operational visibility
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-white/58">
-                Every action moves through authorization, transaction safety, analytics, reporting,
-                and audit-grade observability so teams can trust the system end to end.
-              </p>
-            </motion.div>
-
-            <div className="relative mt-14 overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7">
-              <div className="pointer-events-none absolute inset-x-20 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.08),transparent_30%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.08),transparent_30%)]" />
-              <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(148,163,184,0.18)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.14)_1px,transparent_1px)] [background-size:54px_54px]" />
-              <div className="pointer-events-none absolute inset-0">
-                {[0, 1, 2, 3, 4, 5].map((particle) => (
-                  <motion.span
-                    key={particle}
-                    className="absolute size-1 rounded-full bg-cyan-200/65"
-                    style={{
-                      left: `${12 + particle * 14}%`,
-                      top: `${18 + (particle % 3) * 22}%`,
-                    }}
-                    animate={{
-                      x: [0, 10, -6, 0],
-                      y: [0, -14, 8, 0],
-                      opacity: [0.16, 0.55, 0.22, 0.16],
-                      scale: [1, 1.25, 0.9, 1],
-                    }}
-                    transition={{
-                      duration: 12 + particle * 1.2,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                      delay: particle * 0.4,
-                    }}
-                  />
-                ))}
-              </div>
-
-              <div className="relative grid gap-6 xl:grid-cols-6 xl:gap-0">
-                {workflowSteps.map((step, index) => {
-                  const Icon = step.icon;
-                  const isLast = index === workflowSteps.length - 1;
-
-                  return (
-                    <motion.div
-                      key={step.title}
-                      variants={fadeInUp}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{ duration: 0.65, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                      className="relative xl:px-3"
-                    >
-                      <motion.div
-                        whileHover={{ y: -6, rotateX: 1.5, rotateY: index % 2 === 0 ? -1.5 : 1.5 }}
-                        transition={{ duration: 0.28, ease: "easeOut" }}
-                        style={{ transformStyle: "preserve-3d" }}
-                        className="group relative h-full rounded-[2rem] border border-white/10 bg-[rgba(8,15,30,0.72)] p-5 shadow-[0_0_20px_rgba(34,211,238,0.05)] transition-all duration-300 ease-out hover:border-cyan-300/20 hover:shadow-[0_0_28px_rgba(34,211,238,0.1)]"
-                      >
-                        <div className={cn("pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-br opacity-80", step.accent)} />
-                        <motion.div
-                          aria-hidden
-                          className="pointer-events-none absolute inset-0 rounded-[2rem] border border-cyan-300/15"
-                          animate={{ opacity: [0.18, 0.42, 0.18] }}
-                          transition={{ duration: 5.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: index * 0.25 }}
-                        />
-                        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
-                        <motion.div
-                          aria-hidden
-                          className="pointer-events-none absolute inset-y-0 left-[-16%] w-14 -skew-x-[18deg] bg-gradient-to-r from-transparent via-cyan-200/14 to-transparent"
-                          animate={{ x: ["0%", "420%"] }}
-                          transition={{
-                            duration: 8.5,
-                            repeat: Number.POSITIVE_INFINITY,
-                            repeatDelay: 3.8 + index * 0.2,
-                            ease: "easeInOut",
-                          }}
-                        />
-                        <div className="relative">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex size-12 items-center justify-center rounded-[1.25rem] border border-cyan-300/18 bg-cyan-300/10 shadow-[0_0_20px_rgba(34,211,238,0.12)]">
-                              <Icon className="size-5 text-cyan-100" />
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="type-caption rounded-full border border-emerald-300/18 bg-emerald-300/10 px-2.5 py-1 text-emerald-100">
-                                Live
-                              </span>
-                              <motion.span
-                                className="size-2.5 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.35)]"
-                                animate={{ scale: [1, 1.22, 1], opacity: [0.6, 1, 0.6] }}
-                                transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: index * 0.15 }}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="mt-5">
-                            <div className="type-caption text-cyan-100/60">
-                              Step {String(index + 1).padStart(2, "0")}
-                            </div>
-                            <h3 className="type-heading mt-3 text-xl text-white">
-                              {step.title}
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-white/60">
-                              {step.description}
-                            </p>
-                          </div>
-
-                          <div className="mt-5 rounded-[1.25rem] border border-white/8 bg-white/[0.03] p-3">
-                            <div className="type-caption text-white/35">Operational metadata</div>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {step.metadata.map((item) => (
-                                <span
-                                  key={item}
-                                  className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs text-white/62"
-                                >
-                                  {item}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="mt-4 flex items-center justify-between gap-3 text-xs text-white/42">
-                              <span>{step.detail}</span>
-                              <span>t+{(index + 1) * 120}ms</span>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-
-                      {!isLast ? (
-                        <>
-                          <div className="pointer-events-none absolute left-1/2 top-full z-10 hidden h-6 w-px -translate-x-1/2 bg-gradient-to-b from-cyan-300/40 to-transparent xl:hidden" />
-                          <div className="pointer-events-none absolute right-[-10px] top-1/2 z-10 hidden h-px w-5 -translate-y-1/2 bg-gradient-to-r from-cyan-300/45 to-cyan-300/5 xl:block" />
-                          <div className="pointer-events-none absolute right-[-4px] top-1/2 z-20 hidden size-2 -translate-y-1/2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.35)] xl:block" />
-                          <motion.div
-                            aria-hidden
-                            className="pointer-events-none absolute right-[-18px] top-1/2 z-20 hidden h-[2px] w-10 -translate-y-1/2 rounded-full bg-gradient-to-r from-cyan-300/0 via-cyan-200/70 to-cyan-300/0 xl:block"
-                            animate={{ x: [-6, 14, -6], opacity: [0.28, 0.95, 0.28], scaleX: [0.8, 1.06, 0.8] }}
-                            transition={{ duration: 3.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: index * 0.35 }}
-                          />
-                          <motion.div
-                            aria-hidden
-                            className="pointer-events-none absolute right-[-12px] top-1/2 z-20 hidden h-px w-12 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent xl:block"
-                            animate={{ opacity: [0.08, 0.32, 0.08] }}
-                            transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: index * 0.25 }}
-                          />
-                        </>
-                      ) : null}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              <div className="relative mt-8 grid gap-4 rounded-[1.8rem] border border-white/10 bg-[rgba(8,15,30,0.74)] p-5 md:grid-cols-3">
-                <div>
-                  <div className="type-caption text-cyan-100/58">Transaction pulses</div>
-                  <p className="mt-2 text-sm leading-7 text-white/58">
-                    Every write path is validated, committed, and replay-safe before SynapseOS exposes results to operators.
-                  </p>
-                </div>
-                <div>
-                  <div className="type-caption text-cyan-100/58">Operational trust</div>
-                  <p className="mt-2 text-sm leading-7 text-white/58">
-                    Reports carry metrics, timestamps, ownership, and downstream notification routing so teams can audit every step.
-                  </p>
-                </div>
-                <div>
-                  <div className="type-caption text-cyan-100/58">Enterprise visibility</div>
-                  <p className="mt-2 text-sm leading-7 text-white/58">
-                    Judges can see the exact lifecycle from request to analytics to report delivery to audit logging in one surface.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </SectionReveal>
-        </section>
-
-        <footer className="mx-auto mt-12 w-full max-w-7xl px-5 pb-12 pt-10 md:px-8">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.05] p-8 backdrop-blur-2xl">
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-              <div>
-                <div className="flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-300/10">
-                    <Orbit className="size-5 text-cyan-100" />
-                  </div>
-                  <div>
-                    <div className="type-heading text-lg">SYNAPSEOS</div>
-                    <div className="type-caption text-white/40">
-                      Intelligent database management
-                    </div>
-                  </div>
-                </div>
-                <p className="mt-6 max-w-xl text-white/56">
-                  Future-facing infrastructure software for the teams turning database operations
-                  into a strategic advantage.
+            <motion.div
+              variants={fadeUp}
+              className="relative overflow-hidden rounded-[2rem] border border-cyan-300/14 bg-[linear-gradient(135deg,rgba(8,20,40,0.94),rgba(10,18,36,0.88))] p-7 text-center shadow-lg shadow-black/10 md:p-12"
+            >
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%)]" />
+              <div className="relative mx-auto max-w-3xl">
+                <Badge className="type-caption rounded-full border border-white/12 bg-white/[0.06] px-4 py-1 text-white/62">
+                  Demo ready
+                </Badge>
+                <h2 className="type-display mt-5 text-3xl text-white md:text-5xl">
+                  Experience Intelligent Operations.
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-white/58 md:text-base">
+                  Launch SynapseOS and show judges a focused enterprise DBMS platform with real
+                  RBAC storytelling, AI analytics, report workflows, and realtime monitoring.
                 </p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <a
-                    href="/login"
-                    className={cn(
-                      buttonVariants({ variant: "default", size: "lg" }),
-                      "rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 text-slate-950",
-                    )}
-                  >
-                    Start free
-                  </a>
+                <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                   <Link
                     href="/dashboard"
                     className={cn(
-                      buttonVariants({ variant: "outline", size: "lg" }),
-                      "rounded-full border-white/12 bg-white/5 text-white hover:bg-white/10 hover:text-white",
+                      buttonVariants({ variant: "default", size: "lg" }),
+                      "rounded-full border border-cyan-200/20 bg-gradient-to-r from-cyan-300 to-blue-500 px-7 text-slate-950 hover:brightness-110",
                     )}
                   >
-                    View dashboard
+                    Launch SynapseOS
+                    <ArrowRight className="size-4" />
+                  </Link>
+                  <Link
+                    href="/login"
+                    className={cn(
+                      buttonVariants({ variant: "outline", size: "lg" }),
+                      "rounded-full border-white/12 bg-white/[0.04] px-7 text-white hover:bg-white/[0.08] hover:text-white",
+                    )}
+                  >
+                    Demo login
                   </Link>
                 </div>
               </div>
+            </motion.div>
+          </SectionReveal>
+        </section>
 
-              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                {footerColumns.map((column) => (
-                  <div key={column.title}>
-                    <div className="type-caption text-white/42">
-                      {column.title}
-                    </div>
-                    <div className="mt-4 space-y-3">
-                      {column.items.map((item) => (
-                        <Link
-                          key={item}
-                          href="/"
-                          className="block text-sm text-white/58 transition-colors duration-300 hover:text-white"
-                        >
-                          {item}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+        <footer className="mx-auto w-full max-w-7xl px-5 pb-10 md:px-8">
+          <div className="rounded-[1.6rem] border border-white/10 bg-[#081120]/88 p-6">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-300/10">
+                  <Orbit className="size-5 text-cyan-100" />
+                </div>
+                <div>
+                  <div className="type-heading text-white">SYNAPSEOS</div>
+                  <div className="text-sm text-white/42">Intelligent database operations</div>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-4 text-sm text-white/46">
+                <Link href="#features" className="hover:text-white">Features</Link>
+                <Link href="#architecture" className="hover:text-white">Architecture</Link>
+                <Link href="#security" className="hover:text-white">Security</Link>
+                <Link href="#dashboard" className="hover:text-white">Dashboard</Link>
+                <Link href="https://github.com/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white">
+                  <GitBranch className="size-4" />
+                  GitHub
+                </Link>
               </div>
             </div>
-
-            <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 text-sm text-white/38 md:flex-row md:items-center md:justify-between">
-              <p>(c) 2026 SynapseOS. Engineered for the next era of intelligent infrastructure.</p>
-              <p>Built for teams that want cinematic clarity at production scale.</p>
+            <div className="mt-6 border-t border-white/8 pt-5 text-sm text-white/36">
+              (c) 2026 SynapseOS. Built for premium enterprise DBMS demos and production-style SaaS storytelling.
             </div>
           </div>
         </footer>

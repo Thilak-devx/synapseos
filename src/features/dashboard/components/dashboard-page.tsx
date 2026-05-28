@@ -62,7 +62,7 @@ import {
 } from "@/lib/report-workflow";
 import { cn } from "@/lib/utils";
 import { APP_ROLES, ROLE_PERMISSIONS } from "@/lib/rbac";
-import { getDashboardSectionMeta } from "@/services/dashboard.service";
+import { getDashboardSectionMeta } from "@/services/dashboard-meta";
 import { AnimatedCounter } from "@/features/dashboard/components/animated-counter";
 import type {
   ActivityFeedItem,
@@ -651,6 +651,10 @@ export function DashboardPage({
 
   useEffect(() => {
     const interval = window.setInterval(() => {
+      if (document.hidden) {
+        return;
+      }
+
       const tick = Date.now();
       const template = pickLiveTemplate(liveActivityTemplates, Math.floor(tick / 4200));
       const activity = buildLiveActivity(template, tick);

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "prisma generate --schema prisma/schema.prisma && next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
@@ -13,12 +13,13 @@
     "prisma:migrate": "prisma migrate dev --schema prisma/schema.prisma",
     "prisma:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema prisma/schema.prisma",
-    "db:seed": "node --env-file=.env prisma/seed.mjs"
+    "db:seed": "node prisma/seed.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@hookform/resolvers": "^5.4.0",
     "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/adapter-pg": "^6.19.0",
     "@prisma/client": "^6.19.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

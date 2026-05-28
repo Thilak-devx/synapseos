@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Archive,
   CopyPlus,
@@ -72,13 +72,33 @@ export function ReportDetailDialog({
   open,
   report,
 }: ReportDetailDialogProps) {
-  const pdfPreviewUrl = useMemo(() => {
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
     if (!open || !report || report.exportFormat !== "PDF") {
-      return null;
+      return;
     }
 
-    return URL.createObjectURL(buildPdfReportBlob(report));
+    let revoked = false;
+    let nextUrl: string | null = null;
+
+    void buildPdfReportBlob(report).then((blob) => {
+      if (revoked) {
+        return;
+      }
+
+      nextUrl = URL.createObjectURL(blob);
+      setPdfPreviewUrl(nextUrl);
+    });
+
+    return () => {
+      revoked = true;
+      if (nextUrl) {
+        URL.revokeObjectURL(nextUrl);
+      }
+    };
   }, [open, report]);
+  const activePdfPreviewUrl = open && report?.exportFormat === "PDF" ? pdfPreviewUrl : null;
 
   useEffect(() => {
     return () => {
@@ -217,7 +237,7 @@ export function ReportDetailDialog({
                     </div>
 
                     {report.exportFormat === "PDF" ? (
-                      !pdfPreviewUrl ? (
+                      !activePdfPreviewUrl ? (
                         <div className="space-y-3">
                           <Skeleton className="h-10 w-40 rounded-full" />
                           <Skeleton className="h-[420px] w-full rounded-[1.4rem]" />
@@ -226,7 +246,7 @@ export function ReportDetailDialog({
                         <div className="overflow-hidden rounded-[1.4rem] border border-white/8 bg-[#040812]">
                           <iframe
                             title={`${report.title} preview`}
-                            src={pdfPreviewUrl}
+                            src={activePdfPreviewUrl}
                             className="h-[360px] w-full sm:h-[480px] lg:h-[620px]"
                           />
                         </div>
