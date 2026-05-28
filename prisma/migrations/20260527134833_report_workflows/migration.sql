@@ -1,0 +1,3 @@
+-- Report workflow fields are included in the PostgreSQL baseline migration.
+-- This historical migration is intentionally retained as a no-op so existing
+-- migration ordering remains stable for deployments.

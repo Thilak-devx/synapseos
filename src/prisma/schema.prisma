@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String         @id @default(cuid())
+  name            String
+  email           String         @unique
+  password        String
+  avatar          String?
+  roleId         String
+  departmentId   String?
+  emailVerified  DateTime?
+  status         String         @default("ACTIVE")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  role           Role           @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  department     Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  accounts       Account[]
+  sessions       Session[]
+  auditEvents    AuditEvent[]
+  activityLogs   ActivityLog[]
+  notifications  Notification[]
+  reports        Report[]
+  assignedReports Report[]      @relation("AssignedReports")
+
+  @@index([roleId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  users       User[]
+  permissions RolePermission[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  roles       RolePermission[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model Department {
+  id           String    @id @default(cuid())
+  name         String    @unique
+  description  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  users        User[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String?
+  entityId   String?
+  ipAddress  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([ipAddress])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  userId     String
+  type       String   @default("SYSTEM")
+  title      String
+  message    String
+  isRead     Boolean  @default(false)
+  relatedEntityType String?
+  relatedEntityId String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
+  @@index([type, createdAt(sort: Desc)])
+}
+
+model Report {
+  id            String   @id @default(cuid())
+  title         String
+  generatedById String?
+  assignedToId  String?
+  status        String   @default("QUEUED")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  generatedBy   User?        @relation(fields: [generatedById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  assignedTo    User?        @relation("AssignedReports", fields: [assignedToId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([generatedById, status])
+  @@index([assignedToId, status])
+  @@index([createdAt(sort: Desc)])
+}
+
+model SystemMetric {
+  id           String   @id @default(cuid())
+  cpuUsage     Float
+  memoryUsage  Float
+  databaseLoad Float    @default(0)
+  activeUsers  Int
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  eventType  String
+  entityType String?
+  entityId   String?
+  ipAddress  String?
+  payload    Json?
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([eventType, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId, expires])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@unique([token])
+  @@index([expires])
+}
