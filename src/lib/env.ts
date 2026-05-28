@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-const fallbackDatabaseUrl =
-  "postgresql://postgres:postgres@localhost:5432/syy?schema=public";
+const fallbackDatabaseUrl = "";
 
 const envSchema = z.object({
   NEXTAUTH_URL: z.string().url().optional(),
